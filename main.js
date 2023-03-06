@@ -1,4 +1,4 @@
-const {app, BrowserWindow, globalShortcut} = require('electron')
+const {app, BrowserWindow} = require('electron')
 const path = require('path')
 
 function createWindow () {
@@ -6,7 +6,10 @@ function createWindow () {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    // frame: false,
+    // transparent:true,
     webPreferences: {
+      webSecurity: false,
       preload: path.join(__dirname, 'preload.js')
     },
     nodeIntegration: true,
