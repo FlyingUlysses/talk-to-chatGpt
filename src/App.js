@@ -1,62 +1,10 @@
 import React from "react";
 import Chat,{ useMessages,Bubble} from "@chatui/core";
 import "@chatui/core/dist/index.css";
+import {chatToChatGpt} from "./util/request/rquestContext.js"
 
 export default function App() {
   const { messages, appendMsg, setTyping } = useMessages([]);
-  
-  async function createCompletion(msg) {
-    const params_ = {
-        model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: msg }],
-        temperature: 0,
-    };
-    const result = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer xx'
-        },
-        body: JSON.stringify(params_)
-    });
-    const stream = result.body
-    const output = await fetchStream(stream);
-    const resMsgObj  =output.choices[0].message;
-    appendMsg({
-      type: "text",
-      content: { text: resMsgObj.content.trim() }
-    });
-  }
-
-  async function fetchStream(stream) {
-      const reader = stream.getReader();
-      let charsReceived = 0;
-      const li = document.createElement("li");
-
-      // read() returns a promise that resolves
-      // when a value has been received
-      const result = await reader.read().then(
-          function processText({ done, value }) {
-              // Result objects contain two properties:
-              // done  - true if the stream has already given you all its data.
-              // value - some data. Always undefined when done is true.
-              if (done) {
-                  return li.innerText;
-              }
-              // value for fetch streams is a Uint8Array
-              charsReceived += value.length;
-              const chunk = value;
-              li.appendChild(document.createTextNode(chunk));
-              return reader.read().then(processText);
-          });
-      const list = result.split(",")
-      const numList = list.map((item) => {
-          return parseInt(item)
-      })
-      const text = String.fromCharCode(...numList);
-      const response = JSON.parse(text)
-      return response
-  }
 
   function handleSend(type, val) {
     if (type === "text" && val.trim()) {
@@ -69,12 +17,15 @@ export default function App() {
       setTyping(true);
 
       //request to chatGpt
-      createCompletion(val);
+      chatToChatGpt(val).then(res=>{
+        appendMsg({
+          type: "text",
+          content: { text: res }
+        });
+      })
 
     }
   }
-
-  
 
   function renderMessageContent(msg) {
     const { content } = msg;
@@ -82,9 +33,13 @@ export default function App() {
   }
 
   // #####################  navbar  ###################################
+  function openMenu(e) {
+  }
+
   function renderLeftContent() {
     return {
-      icon:"apps"
+      icon:"apps",
+      onClick:openMenu
     }
   }
 
