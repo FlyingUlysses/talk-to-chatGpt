@@ -1,7 +1,7 @@
 import React from "react";
 import Chat,{ useMessages,Bubble} from "@chatui/core";
 import "@chatui/core/dist/index.css";
-import {chatToChatGpt} from "./util/request/requestContext.js"
+import {chatToChatGpt,textToVoice} from "./util/request/requestContext.js"
 
 export default function App() {
 
@@ -23,6 +23,7 @@ export default function App() {
           type: "text",
           content: { text: res }
         });
+        textToVoice(res)
       })
     }
   }
@@ -35,9 +36,14 @@ export default function App() {
   }
 
   // #####################  navbar  ###################################
+  function openFunctionList(e) {
+    textToVoice("hi,text voice");
+  }
+
   function renderLeftContent() {
     return {
-      icon:"apps"
+      icon:"apps",
+      onClick:openFunctionList
     }
   }
 

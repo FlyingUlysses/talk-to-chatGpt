@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const open_ai_key = "xx";
+import config from '../config.js'
 
 // get请求
 export function getRequest(url,sendData){
@@ -33,7 +32,7 @@ export function chatToChatGpt(msg) {
     };
     const headers_= {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer  '+ open_ai_key
+        'Authorization': 'Bearer ' + config.openApiKey
     }
     // const headers_ = 
     return new Promise((resolve,reject)=>{
@@ -45,5 +44,28 @@ export function chatToChatGpt(msg) {
             reject(error);    
       })                 
     })
-    
+}
+
+// microsoft text to voice
+export function textToVoice(text) {
+    var SpeechSDK = require("microsoft-cognitiveservices-speech-sdk");
+    var speechConfig = SpeechSDK.SpeechConfig.fromSubscription(config.speechKey, config.sppechRegion);
+    speechConfig.speechSynthesisVoiceName = "en-US-JaneNeural";
+    var synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig);
+    synthesizer.speakTextAsync(
+        text,
+        function (result) {
+            if (result.reason === SpeechSDK.ResultReason.SynthesizingAudioCompleted) {
+            } else if (result.reason === SpeechSDK.ResultReason.Canceled) {
+                console.info("synthesis failed. Error detail: " + result.errorDetails + "\n");
+            }
+            synthesizer.close();
+            synthesizer = undefined;
+        },
+        function (err) {
+            console.error(err);
+            synthesizer.close();
+            synthesizer = undefined;
+        }
+    );
 }
