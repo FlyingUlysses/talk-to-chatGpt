@@ -1,5 +1,6 @@
 import axios from 'axios';
 import config from '../config.js'
+import {gptMsgList,addAIMsg,addUserMsg} from '../chatGpt/chatGpt.js'
 
 // get请求
 export function getRequest(url,sendData){
@@ -25,9 +26,10 @@ export function postRequest(url,sendData){
 
 // chat to chatGpt
 export function chatToChatGpt(msg) {
+    addUserMsg(msg);
     const params_ = {
         model: "gpt-3.5-turbo",
-        messages: [{ role: "user", content: msg }],
+        messages: gptMsgList,
         temperature: 0,
     };
     const headers_= {
@@ -39,7 +41,9 @@ export function chatToChatGpt(msg) {
         axios.post("https://api.openai.com/v1/chat/completions",
             params_,
             {headers:headers_}).then(res=>{
-                resolve(res.data.choices[0].message.content.trim());    
+                var msgObj = res.data.choices[0].message;
+                addAIMsg(msgObj);
+                resolve(msgObj.content.trim());    
       }).catch(error=>{
             reject(error);    
       })                 

@@ -23,21 +23,23 @@ export default function App() {
           type: "text",
           content: { text: res }
         });
-        textToVoice(res)
       })
     }
   }
 
-  
-
   function renderMessageContent(msg) {
     const { content } = msg;
-    return <Bubble content={content.text} />;
+    return <Bubble content={content.text} onClick={voiceReaderMsg} />;
+  }
+
+  function voiceReaderMsg(e) {
+    if(messages != null && messages.length >0 && messages[messages.length-1].content.text) {
+      textToVoice(messages[messages.length-1].content.text);
+    }
   }
 
   // #####################  navbar  ###################################
   function openFunctionList(e) {
-    textToVoice("hi,text voice");
   }
 
   function renderLeftContent() {
@@ -64,6 +66,7 @@ export default function App() {
 
   // turn on voice msg
   function turnOnVoice(e) {
+    voiceReaderMsg(e);
   }
 
 
