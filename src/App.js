@@ -1,5 +1,5 @@
-import React from "react";
-import Chat,{ useMessages,Bubble} from "@chatui/core";
+import React,{ useState } from "react";
+import Chat,{ useMessages,Bubble,Modal,Input } from "@chatui/core";
 import "@chatui/core/dist/index.css";
 import {chatToChatGpt,textToVoice} from "./util/request/requestContext.js"
 
@@ -41,7 +41,6 @@ export default function App() {
   // #####################  navbar  ###################################
   function openFunctionList(e) {
   }
-
   function renderLeftContent() {
     return {
       icon:"apps",
@@ -56,13 +55,26 @@ export default function App() {
         icon:"apps"
       },
       {
-        icon:"info-circle"
+        icon:"info-circle",
+        onClick: openSetting
       }
     ];
   }
 
   // #####################  navbar  ###################################
 
+  // #####################  setting  ###################################
+  
+  const [open, setOpen] = useState(false);
+  const [openApiKey, setOpenApiKey] = useState(null);
+  const [azureKey, setAzureKey] = useState(null);
+
+  function openSetting(e) {
+   setOpen(true);
+  }
+
+
+  // #####################  setting  ###################################
 
   // turn on voice msg
   function turnOnVoice(e) {
@@ -71,18 +83,39 @@ export default function App() {
 
 
   return (
-    <Chat
-      navbar={{ title: "talk to chatGpt",leftContent:renderLeftContent(),rightContent:renderRightContent()}}
-      messages={messages}
-      inputType='text'
-      onSend={handleSend}
-      renderMessageContent={renderMessageContent}
-      rightAction={
-        {
-          icon:"mic",
-          onClick:turnOnVoice
-        }
-      }
-    />
+    <div>
+        <Chat
+          navbar={{ title: "talk to chatGpt",leftContent:renderLeftContent(),rightContent:renderRightContent()}}
+          messages={messages}
+          inputType='text'
+          onSend={handleSend}
+          renderMessageContent={renderMessageContent}
+          rightAction={
+            {
+              icon:"mic",
+              onClick:turnOnVoice
+            }
+          }
+        />
+      <Modal
+        active={open}
+        title="系统设置"
+        showClose={false}
+        actions={[
+          {
+            label: '保存',
+            color: 'primary',
+          },
+          {
+            label: '取消',
+          },
+          ]}
+        >
+        <h3>Open-AI Key</h3>
+        <Input value={openApiKey} onChange={val => setOpenApiKey(val)} placeholder="请输入..." />
+        <h3>Azure Key</h3>
+        <Input value={azureKey} onChange={val => setAzureKey(val)} placeholder="请输入..." />
+      </Modal>
+    </div>
   );
 }
